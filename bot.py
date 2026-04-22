@@ -1,7 +1,7 @@
 import os
 import discord
 from discord.ext import commands
-import google.generativeai as genai
+from google import genai
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -14,11 +14,7 @@ MAX_HISTORY     = int(os.getenv("MAX_HISTORY", "20"))
 MAX_RESPONSE    = int(os.getenv("MAX_RESPONSE", "1800"))
 # ─────────────────────────────────────────────────────────────────────────────
 
-genai.configure(api_key=GEMINI_KEY)
-model = genai.GenerativeModel(
-    model_name="gemini-3.1-flash",
-    system_instruction=SYSTEM_PROMPT,
-)
+client_gemini = genai.Client(api_key=GEMINI_KEY)
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -37,15 +33,13 @@ def get_session(user_id: int):
 
 
 async def ask_gemini(user_id: int, user_message: str) -> str:
-    """Send a message to Gemini and return the reply."""
-    session = get_session(user_id)
-    response = session.send_message(user_message)
+    response = client_gemini.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=user_message,
+    )
     reply = response.text
-
-    # Truncate if too long for Discord
     if len(reply) > MAX_RESPONSE:
         reply = reply[:MAX_RESPONSE] + "\n…*(response truncated)*"
-
     return reply
 
 

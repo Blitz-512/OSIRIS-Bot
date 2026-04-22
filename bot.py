@@ -16,7 +16,7 @@ MAX_RESPONSE    = int(os.getenv("MAX_RESPONSE", "1800"))
 
 genai.configure(api_key=GEMINI_KEY)
 model = genai.GenerativeModel(
-    model_name="gemini-1.5-flash",
+    model_name="gemini-3.1-flash",
     system_instruction=SYSTEM_PROMPT,
 )
 
